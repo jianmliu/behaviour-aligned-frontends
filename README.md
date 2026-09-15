@@ -1,11 +1,11 @@
-# Behaviour-Aligned Front-Ends for Full-Duplex Speech LLMs, With and Without Gradients
+# Behaviour-Aligned Front-Ends for Full-Duplex Speech LLMs: Signal Restoration Is Not Behaviour Restoration
 
 Reproduction package for the ICASSP 2027 submission of the same title (`paper/main.pdf`).
 
 The paper asks one question: when a 78k-parameter RNNoise-style suppressor sits in front of a
 frozen full-duplex speech LLM, should it be trained to restore the *signal* or to serve the
-model's *turn-taking decision*, and can the latter be done without gradients through the model?
-Everything here is organised around the two arms of that comparison.
+model's *turn-taking decision*? The gradient-free (evolution-strategies) arm is kept as a probe.
+Everything here is organised around the arms of that comparison.
 
 | Arm | Model | Objective | Optimiser | Where it runs |
 |---|---|---|---|---|
@@ -133,14 +133,14 @@ ramp and the logit-margin term, and target extraction from real trajectories.
 - The figure `paper/fig_placement.pdf` is included; the one-off script that drew it from
   `lychee/results/*.json` was not preserved.
 - Lychee-FD ES and soft-placement jobs (`queue/29`–`33`) are complete and smoke-tested but were not run for
-  the submitted paper; the black-box arm is reported on Freeze-Omni only, as the paper states.
+  the submitted paper; the gradient-free probe is reported on Freeze-Omni only, as the paper states.
 - The Freeze-Omni relevance judge runs the 7B text model on MPS at ~3.4 s/item; 3,000 items take ~3 h.
 
 ## Citation
 
 ```
 @inproceedings{liu2027behaviour,
-  title     = {Behaviour-Aligned Front-Ends for Full-Duplex Speech {LLM}s, With and Without Gradients},
+  title     = {Behaviour-Aligned Front-Ends for Full-Duplex Speech {LLM}s: Signal Restoration Is Not Behaviour Restoration},
   author    = {Liu, Jianming},
   booktitle = {Proc. ICASSP},
   year      = {2027}

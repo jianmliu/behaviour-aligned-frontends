@@ -13,7 +13,7 @@
 \newcommand{\vc}{VoiceChat}
 \newcommand{\rn}{RN-t}% RNNoise-style torch front-end
 
-\title{Behaviour-Aligned Front-Ends for Full-Duplex Speech LLMs, With and Without Gradients}
+\title{Behaviour-Aligned Front-Ends for Full-Duplex Speech LLMs:\\ Signal Restoration Is Not Behaviour Restoration}
 
 \name{Jianming Liu\thanks{Code, recipes and logs: \url{https://github.com/jianmliu/behaviour-aligned-frontends}.}}
 \address{Independent Researcher, Newton, USA}
@@ -23,18 +23,19 @@
 
 \begin{abstract}
 Hosted full-duplex speech LLMs are absorbing signal clean-up; what remains on the device is a
-front-end whose job is to serve the model's \emph{turn-taking decision}---and whose builder may
-not own the model. We study how to align a 78\,k-parameter RNNoise-style front-end to that
-decision under two regimes: \emph{with} gradients through a frozen open model, and
-\emph{without}, from the model's turn decisions alone, as a hosted API would expose. On one open
-model (Freeze-Omni) the two are compared directly on the same front-end and objective. As the measurement
-instrument we add a controlled noise protocol to the HumDial test set and score first-response
-placement. On \lfd\ (12.8\,B), signal-trained suppression restores audibility and with it every
-clean-condition pathology, while behaviour-level training cuts wrong-place responses from
-67\,\% to 48\,\% ($p<10^{-23}$, paired) at no cost in on-time responses: signal restoration is
-not behaviour restoration. On Freeze-Omni (7B) we train an event-level placement objective with
-gradients and by evolution strategies on decisions only. This eager model's failures are linguistic and a waveform front-end has no leverage at moderate noise; once masking is severe enough ($-$15\,dB) to make noise a trigger, gradient alignment reverses the front-end's effect (later take-overs, $p<10^{-35}$ vs.\ the frozen suppressor) while a 23-dimensional black-box policy with 3k rollouts stays at the signal solution: at the budgets tried, the price of losing gradients is the whole effect. Protocol,
-metrics and recipes are released.
+front-end whose job is to serve the model's \emph{turn-taking decision}. We ask whether the deployed
+remedy for noise---a suppressor trained on signal metrics---serves that decision, and what changes when
+the same 78\,k-parameter RNNoise-style front-end is instead aligned to the decision through a frozen
+model. As the measurement instrument we add a controlled noise protocol to the HumDial test set and
+score first-response placement. On \lfd\ (12.8\,B), signal-trained suppression restores audibility and
+with it every clean-condition pathology, while behaviour-level training cuts wrong-place responses from
+67\,\% to 48\,\% ($p<10^{-23}$, paired) at no cost in on-time responses. On Freeze-Omni (7B), an eager
+model whose failures are linguistic, a front-end has no leverage at moderate noise; once masking is severe
+enough to make noise a trigger, the frozen suppressor makes the model take over earlier and the
+decision-aligned one later ($p<10^{-35}$), with first-response relevance preserved. Signal restoration is
+not behaviour restoration: the two objectives select different front-ends, and the behaviour-aligned one's
+leverage tracks the acoustic share of the failure. Aligning from the model's decisions alone, without
+gradients, did not reach that solution at the budgets we tried. Protocol, metrics and recipes are released.
 \end{abstract}
 \begin{keywords}
 full-duplex speech LLM, noise suppression, turn-taking, false barge-in, behaviour-aware front-end
@@ -69,25 +70,25 @@ data the downstream model never sees. Hosted full-duplex models change what such
 \emph{for}. Signal clean-up is being absorbed into the model; what stays on the device is what
 the cloud cannot do: decide, cheaply and privately, whether a sound is addressed to the system
 and whether a turn is coming---before a metered session sees it. A front-end with that job must
-be aligned to the \emph{behaviour} of a model its builder may not own and cannot backpropagate
-through. Whether signal-metric training serves the turn-taking decision, and whether
-behaviour-level alignment is reachable with and without gradients, are the questions this paper
-measures, with the model held frozen throughout.
+be aligned to the \emph{behaviour} of the model it serves. Whether signal-metric training does that,
+and what behaviour-level alignment changes, are the questions this paper measures, with the model
+held frozen throughout; whether such alignment is reachable without gradients, as a hosted API would
+require, we only probe.
 
 % 段4: 为什么行为目标这次能成（无反馈环）
 A companion line of work on \emph{acoustic echo} found that even cross-entropy on the model's own turn-taking tokens leaves an objective--behaviour gap dominated by teacher-forcing \emph{exposure}: echo is the model's own output fed back, and the states that break the benchmark are never visited under teacher forcing (companion work, in submission). Noise carries no such loop---it is exogenous, ``do not activate on this'' is an ordinary conditional decision fully covered by teacher-forced supervision, and 78\,k parameters leave little room for degenerate shortcuts. If behaviour-level training of a front-end works anywhere, it should work here.
 
 % 段5: 贡献
-Contributions. (1)~\emph{Two regimes, one testbed} (Freeze-Omni, 7B): we align the same 78\,k front-end to the
-same frozen model under the same placement objective (a)~with gradients through the model and
-(b)~without---by evolution strategies on the model's turn decisions alone, the interface a hosted
-API exposes. Neither has leverage at moderate noise; where severe masking creates an acoustic failure, (a) reverses the front-end's effect and (b) does not at any budget tried, even given (a)'s own loss as reward---the measured price of losing gradients. (2)~The measurement instrument: a
+Contributions. (1)~\emph{Signal restoration is not behaviour restoration}, on two models: the same 78\,k
+front-end, trained on signal metrics, hands a frozen full-duplex model back its clean-condition
+pathologies (\lfd) or makes it take over earlier (Freeze-Omni, at every SNR tried); aligned to the
+model's turn decision through gradients, it reverses that effect, with leverage that tracks the acoustic
+share of the failure and no cost in first-response relevance. (2)~The measurement instrument: a
 noise-augmented behavioural protocol on the HumDial test set scoring first-response
 \emph{placement}, grounded in the benchmark's respond/refrain semantics (\S\ref{sec:protocol}).
-(3)~With gradients on \lfd: signal-trained suppression restores audibility and with it every
-clean-condition pathology, while behaviour-level training cuts the wrong-place total from 67 to 48\,\%
-($p<10^{-23}$, paired) at no cost in on-time responses---signal restoration and behaviour
-restoration come apart (\S\ref{sec:results}). (4)~Released protocol, metrics, recipes and logs.
+(3)~On \lfd\ the behaviour-trained front-end cuts the wrong-place total from 67 to 48\,\%
+($p<10^{-23}$, paired) at no cost in on-time responses, and ablations show the signal and behaviour
+solutions to be distinct attractors (\S\ref{sec:results}). (4)~Released protocol, metrics, recipes and logs.
 
 \section{Setup}
 \label{sec:protocol}
@@ -193,40 +194,43 @@ baseline's 5.4\,\% (both n.s.). The trade it learns is legible: speak when the d
 survives the noise, stay silent when it does not, rather than reconstruct everything the model
 might react to.
 
-\subsection{Second model: with and without gradients}
+\subsection{Second model: leverage tracks the acoustic share}
 \label{sec:fo}
-A hosted model exposes no logits and no gradients---only its behaviour. To test whether
-behaviour-level alignment survives that interface, we repeat the protocol on
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_fo_dose.pdf}
+\caption{Freeze-Omni, four systems on 1{,}000 paired samples per SNR. The signal-trained suppressor makes the eager model take over earlier at every SNR; the behaviour-aligned front-end, same parameters, makes it later, and its gain grows with the acoustic share. Dotted: clean audio.}
+\label{fig:fo}
+\end{figure}
+To test whether the \lfd\ finding is specific to one model, we repeat the protocol on
 Freeze-Omni~\cite{freezeomni2024} (7B, frozen Qwen2 backbone, a chunk-level \emph{state head}
 that decides when to speak; listening needs no token generation, so placement is read from that
-decision alone) on the same 1{,}000-sample protocol (200 samples, 20/scenario, for the ES and
-self-distillation variants and the clean-audio and probe rows), and train the same 78\,k
-front-end two ways from the same signal-pretrained start: (a)~a differentiable \emph{expected placement cost}
+decision alone) on the same 1{,}000-sample protocol (200 samples, 20/scenario, for the
+self-distillation variant and the clean-audio and probe rows), and train the same 78\,k
+front-end from the same signal-pretrained start with a differentiable \emph{expected placement cost}
 (first-trigger distribution over chunks $\times$ premature/on-time/miss costs, refrain samples
 penalising any trigger, plus a logit-margin term in the premature region so that a saturated
-decision still carries gradient) with gradients through the frozen model; (b)~evolution strategies on the
-realised placement reward, using nothing but the model's turn decisions. Freeze-Omni's clean
+decision still carries gradient) through the frozen model. Freeze-Omni's clean
 profile is the mirror image of \lfd's: on-time 40.6\,\%, premature 43.8\,\%, no misses---and no
 restraint: it fires inside third-party speech in 99/100 \texttt{others\_before} samples and
 inside the pause gap in 57/100. Noise at the protocol's SNR (0--15\,dB) does not move it at
 all (on-time 40.6\,\%, premature 43.4\,\%, restraint axes 100/100 and 60/100): an eager model
 is not deafened. Pushed further, an acoustic share does appear---but as \emph{more} eagerness,
-not silence: at $-$5, $-$10, $-$15 and $-$20\,dB premature take-overs rise to 46.3, 51.2, 56.5 and 63.0\,\%
-(1{,}000 samples each) with still no misses; sustained masking acts as a trigger, whereas three 300\,ms bursts at +10/+20\,dB barely register (42.5/40.0, 39.5/43.5): HumDial's transient false activations are not this model's failure mode. Two
-consequences follow. Self-distillation cannot be the target here---on Full-Duplex-Bench the
-model's own clean first response precedes the annotated end of the user's turn by a median
-7.3\,s (90\,\% of samples $>$1\,s early)---so we take the benchmark's turn-end annotations as
-placement targets; and the front-end's job is restraint rather than restoration, so we also check clean audio,
+not silence: from $-$5 to $-$20\,dB premature take-overs rise from 46.3 to 63.0\,\% (Fig.~\ref{fig:fo};
+1{,}000 samples each) with still no misses; sustained masking acts as a trigger, whereas 300\,ms bursts at +10/+20\,dB barely register (42.5/40.0, 39.5/43.5): transient false activations are not this model's failure mode. Two
+consequences follow. Self-distillation cannot be the target here---the model's own clean first
+response precedes the annotated turn end by a median 7.3\,s on Full-Duplex-Bench---so we take the
+benchmark's turn-end annotations as placement targets; and the front-end's job is restraint rather than restoration, so we also check clean audio,
 where all three front-ends leave placement unchanged (200 samples, n.s.). Under noise, the frozen suppressor nudges
 the model slightly \emph{more} eager (on-time 38.8\,\%, premature 45.1\,\%, restraint axes
 100/100 and 61/100: cleaner speech, if anything earlier take-over). The behaviour-trained
 front-ends land on the noisy baseline---soft placement with
 annotation targets 39.7/44.3 on 1{,}000 samples, restraint axes 100/100 and 60/100 exactly as
-without it; on 200 samples, self-distillation targets 43.0/39.0 and ES 37.5/45.5
-(on-time/premature), all within sampling noise. Per sample, noise moves 32\,\% of decision instants symmetrically; the front-ends move 25--29\,\%, and the \emph{wrong} way for restraint---earlier take-overs outnumber later ones 172:115 (frozen) and 156:91 (trained), sign test $p<10^{-3}$: cleaner speech makes an eager model marginally more eager. The trained suppressor kept 6.4 of the frozen model's 8.6\,dB SI-SNR gain on its training mixtures: nothing
+without it; on 200 samples, self-distillation targets 43.0/39.0
+(on-time/premature), all within sampling noise. Per sample, the front-ends move decision instants the \emph{wrong} way for restraint---earlier take-overs outnumber later ones 172:115 (frozen) and 156:91 (trained), sign test $p<10^{-3}$: cleaner speech makes an eager model marginally more eager. The trained suppressor kept 6.4 of the frozen model's 8.6\,dB SI-SNR gain on its training mixtures: nothing
 collapsed, and the only direction found was the acoustic one. \emph{Where the acoustic share exists, the leverage appears.} At $-$15\,dB (1{,}000 paired
 samples; 28.4/56.5 without a front-end) the frozen suppressor makes matters worse---24.3/61.2, decisions earlier 340:174 (sign test $p=2{\times}10^{-13}$): denoising feeds the trigger. The behaviour-trained front-end moves them the other way: 35.8/49.0, later 309:173 against no front-end ($p=6{\times}10^{-10}$) and 432:139 against the frozen suppressor ($p<10^{-35}$). The same 78\,k parameters, aligned to the decision
-instead of the signal, reverse the front-end's effect: the \lfd\ finding on a second model. The black-box arm does not follow: evolution strategies over a 23-parameter band-gain policy (40 generations, 3k rollouts) end at 24.7/60.8, indistinguishable from the frozen suppressor ($p=0.27$) and earlier than the gradient-trained front-end 421:154. All 78\,k parameters at the same budget only wander (17.4/68.7, $p<10^{-11}$ vs.\ frozen). Tripling the generations (120) barely moves it (24.6/60.5), and the gradient arm's own dense loss as reward does not help either (25.9/59.5; 23.6/61.5 over all 78\,k parameters): the price is the direction, not the reward or the budget. At $-$10\,dB the pattern replicates: frozen earlier (28.8/55.7 vs.\ 32.9/51.2; 294:168), gradient-aligned later (36.9/47.1; 356:150 vs.\ frozen), black-box at or past the frozen solution (27.1/57.6; 392:145 earlier than gradient-aligned), all $p<10^{-8}$. At $-$5\,dB the frozen suppressor still harms (32.4/51.9 vs.\ 37.7/46.3); gradient alignment only cancels that harm (38.2/46.1). Content follows: judged by Qwen2-7B-Instruct on the opening of the first response (0--2 relevance, $-$15\,dB), the frozen suppressor lowers relevance (0.77 vs.\ 0.83, $p=0.07$), gradient alignment keeps it (0.84; 170:132 above frozen, $p=0.03$) and cuts hallucinated Chinese openings from 13.6 to 9.4\,\% ($p=2{\times}10^{-4}$): later take-overs cost no relevance. Across regimes, a waveform front-end has leverage only over the acoustic share of a
+instead of the signal, reverse the front-end's effect: the \lfd\ finding on a second model. A hosted API would expose only the decisions; as a probe, evolution strategies on the realised placement reward (23 band gains, 3k rollouts) end at the frozen solution (24.7/60.8, $p=0.27$ vs.\ frozen), and neither tripling the budget, searching all 78\,k parameters, nor using the gradient arm's own loss as reward moves them (24.6/60.5, 17.4/68.7, 25.9/59.5): at these budgets, decision-only feedback did not find the direction gradients find. The pattern replicates at $-$10 and $-$20\,dB (all sign tests $p<10^{-6}$); at $-$5\,dB, where noise alone barely moves the model, gradient alignment only cancels the frozen suppressor's harm (Fig.~\ref{fig:fo}). Content follows: judged by Qwen2-7B-Instruct on the opening of the first response (0--2 relevance, $-$15\,dB), the frozen suppressor lowers relevance (0.77 vs.\ 0.83, $p=0.07$), gradient alignment keeps it (0.84; 170:132 above frozen, $p=0.03$) and cuts hallucinated Chinese openings from 13.6 to 9.4\,\% ($p=2{\times}10^{-4}$): later take-overs cost no relevance. Across regimes, a waveform front-end has leverage only over the acoustic share of a
 failure---large on \lfd, near zero here.
 
 \subsection{Ablations: two attractors, no middle ground}
@@ -258,7 +262,7 @@ transcription, and the failure repaired (acting at the wrong time) has no transc
 
 \textbf{Limitations.} English subset only; offline decoding of the official test set (no
 streaming latency axis); front-ends trained through two models (the \vc\ corroboration is
-measurement-only); single noise corpus (DEMAND), though held out between pretraining and test; one LLM judge, opening sentences only; the black-box arm is run on Freeze-Omni only.
+measurement-only); single noise corpus (DEMAND), though held out between pretraining and test; one LLM judge, opening sentences only; the gradient-free probe is zeroth-order search at small budgets on one model.
 
 \section{Conclusion}
 We measured what noise does to the turn-taking decision of a frozen full-duplex speech LLM on
@@ -268,12 +272,11 @@ turn-taking tokens. Signal training restores what the model hears; behaviour tra
 what the model does: the wrong-place total falls from 67 to 48\,\% ($p<10^{-23}$, paired), on-time
 responses are preserved, and the cost is silence where the evidence does not survive the noise.
 The two solutions are separate attractors, not ends of a dial. On a second, eager model the same
-alignment reverses the frozen suppressor's effect once masking creates an acoustic failure;
-decision-only search does not find that direction. This reframes the front-end
+alignment reverses the frozen suppressor's effect once masking creates an acoustic failure. This reframes the front-end
 question for deployment: the choice is not how much to denoise, but which decision the
 denoiser should serve.
 
-\textbf{Use of AI.} Language-model assistants (Anthropic Claude) drafted and refactored code, ran and monitored the experiment queues, and edited prose; every experiment, number and claim was checked by the author, who takes full responsibility for them.
+\textbf{Use of AI.} Claude (Anthropic) assisted with code, experiment orchestration and editing; every result and claim was checked by the author, who takes full responsibility for them.
 
 \clearpage
 \bibliographystyle{IEEEbib}
