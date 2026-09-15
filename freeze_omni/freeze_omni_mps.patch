@@ -1,0 +1,221 @@
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/bin/inference.py repo_mps/bin/inference.py
+--- repo/bin/inference.py	2026-09-11 15:44:47
++++ repo_mps/bin/inference.py	2026-09-11 16:01:20
+@@ -84,7 +84,7 @@
+     cur_text_procced = pipeline.post_process(cur_text)
+     print("Synthesis: ", [cur_text_procced])
+     embeddings = pipeline.model.llm_decoder.model.embed_tokens(
+-                    torch.tensor(pipeline.model.tokenizer.encode(cur_text_procced)).cuda()
++                    torch.tensor(pipeline.model.tokenizer.encode(cur_text_procced)).to("mps")
+                     )
+     for seg in tts.run(embeddings.reshape(-1, 896).unsqueeze(0), decoder_topk,
+                         hidden_state_output.reshape(-1, 896).unsqueeze(0), 
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/bin/server.py repo_mps/bin/server.py
+--- repo/bin/server.py	2026-09-11 15:44:47
++++ repo_mps/bin/server.py	2026-09-11 16:01:20
+@@ -90,7 +90,7 @@
+     embeddings = connected_users[sid][1].pipeline_obj.pipeline_proc.model.llm_decoder.model.embed_tokens(
+                     torch.tensor(connected_users[sid][1].pipeline_obj.pipeline_proc.model.tokenizer.encode(
+                         cur_text_procced
+-                        )).cuda()
++                        )).to("mps")
+                     )
+     codec_chunk_size = server_configs['decoder_first_chunk_size']
+     codec_padding_size = server_configs['decoder_chunk_overlap_size']
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/audioLLM.py repo_mps/models/audioLLM.py
+--- repo/models/audioLLM.py	2026-09-11 15:44:47
++++ repo_mps/models/audioLLM.py	2026-09-11 16:01:20
+@@ -219,10 +219,10 @@
+         # If 'role' key is present in extra_inputs, use that role as the chat prefix
+         if extra_inputs.get('role', None) is not None:
+             chat_prefix = self.tokenizer([extra_inputs['role']], 
+-                return_tensors="pt")['input_ids'].to('cuda')  # Convert role to tokens and move to CUDA device
++                return_tensors="pt")['input_ids'].to("mps")  # Convert role to tokens and move to CUDA device
+         else:
+             # If no 'role' is provided, use the default chat template and remove the last token (<|im_end|>)
+-            chat_prefix = self.chat_template['role'][:, :-1].to('cuda')
++            chat_prefix = self.chat_template['role'][:, :-1].to("mps")
+         
+         # Use the LLM decoder's word embedding layer to convert the chat prefix into embeddings
+         inputs_embeds = self.llm_decoder.transformer.wte(chat_prefix)
+@@ -299,9 +299,9 @@
+                 inputs_embeds = torch.cat((chat_prefix_embeds, inputs_embeds), 1)
+                 attention_mask = torch.cat((chat_prefix_mask, attention_mask), 1)
+             if extra_inputs['stat'] == 'ss':
+-                chat_suffix = self.chat_template['suffix'].to('cuda')
++                chat_suffix = self.chat_template['suffix'].to("mps")
+                 chat_suffix_embeds = self.llm_decoder.transformer.wte(chat_suffix)
+-                chat_suffix_mask = torch.full(chat_suffix.shape, True).to('cuda')
++                chat_suffix_mask = torch.full(chat_suffix.shape, True).to("mps")
+                 inputs_embeds = chat_suffix_embeds
+                 attention_mask = chat_suffix_mask
+         
+@@ -311,7 +311,7 @@
+                 'attention_mask': attention_mask,
+             }
+         else:
+-            attention_mask = torch.full([1, 1], True).to('cuda')
++            attention_mask = torch.full([1, 1], True).to("mps")
+             inputs = {
+                 'input_ids': extra_inputs['last_id'],
+                 'attention_mask': attention_mask
+@@ -320,7 +320,7 @@
+         # add kv cache
+         inputs['past_key_values'] = extra_inputs['past_key_values']
+         past_mask = torch.full([1, inputs['past_key_values'][0][0].size(2)],
+-                                True).to('cuda')
++                                True).to("mps")
+         attention_mask = torch.cat((past_mask, attention_mask), 1)
+         inputs['attention_mask'] = attention_mask
+ 
+@@ -416,7 +416,7 @@
+             state_prob = prob[-1].clone()
+             state_1 = state_prob[1]
+             state_2 = state_prob[2]
+-            print("State 1 prob: {:.4f}, State 2 prob: {:.4f}".format(state_1.item(), state_2.item()))
++            pass  # print("State 1 prob: {:.4f}, State 2 prob: {:.4f}".format(state_1.item(), state_2.item()))
+             if state_2 > 0.5:
+                 return None, outputs['past_key_values'], 'el', None
+             if state_1 > 0.5:
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/decoder/llm2tts.py repo_mps/models/decoder/llm2tts.py
+--- repo/models/decoder/llm2tts.py	2026-09-11 15:44:47
++++ repo_mps/models/decoder/llm2tts.py	2026-09-11 16:01:20
+@@ -16,15 +16,15 @@
+ 
+ class llm2TTS():
+     def __init__(self, model_path):
+-        self.model = self.get_model(model_path).cuda().to(
+-                                    torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32
++        self.model = self.get_model(model_path).to("mps").to(
++                                    torch.bfloat16 if True else torch.float32
+                                     )
+         self.infer = self.model.infer
+ 
+         self.codec_model = VqvaeTester(config_path=model_path + "/codec/model.json", 
+                                         model_path=model_path + "/codec/final.pt",
+                                         sample_rate=24000)
+-        self.codec_model = self.codec_model.cuda()
++        self.codec_model = self.codec_model.to("mps")
+         self.codec_model.vqvae.generator.remove_weight_norm()
+         self.codec_model.vqvae.encoder.remove_weight_norm()
+         self.codec_model.eval()
+@@ -134,8 +134,8 @@
+         right_padding = codec_padding_size
+         buffer = torch.zeros([1, 1, 0]).to(hidden.device)
+         with torch.no_grad():
+-            with torch.autocast(device_type="cuda", 
+-                    dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32):
++            with torch.autocast(device_type="mps", 
++                    dtype=torch.bfloat16 if True else torch.float32):
+                 print("Starting TTS...")
+                 token = torch.full((1, 0), self.model.vocab_size, dtype=torch.long, device=hidden.device)
+                 for next_token_id in self.infer(hidden, top_k, prefix, penalty_window_size, penalty):
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/decoder/ticodec/vqvae_tester.py repo_mps/models/decoder/ticodec/vqvae_tester.py
+--- repo/models/decoder/ticodec/vqvae_tester.py	2026-09-11 15:44:47
++++ repo_mps/models/decoder/ticodec/vqvae_tester.py	2026-09-11 16:01:20
+@@ -19,7 +19,7 @@
+         wav, sr = librosa.load(wav_path, sr=self.sample_rate)
+         fid = os.path.basename(wav_path)[:-4]
+         wav = torch.tensor(wav).unsqueeze(0)
+-        wav = wav.cuda()
++        wav = wav.to("mps")
+         # vq_codes is acoustic token
+         vq_codes, global_token = self.vqvae.encode(wav)
+         import pdb; pdb.set_trace()
+@@ -31,7 +31,7 @@
+         wav, sr = librosa.load(wav_path, sr=self.sample_rate)
+         fid = os.path.basename(wav_path)[:-4]
+         wav = torch.tensor(wav).unsqueeze(0)
+-        wav = wav.cuda()
++        wav = wav.to("mps")
+         # vq_codes is acoustic token
+         vq_codes, global_token = self.vqvae.encode(wav)
+         return fid, vq_codes, global_token
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/encoder/encoder.py repo_mps/models/encoder/encoder.py
+--- repo/models/encoder/encoder.py	2026-09-11 15:44:47
++++ repo_mps/models/encoder/encoder.py	2026-09-11 18:28:31
+@@ -1,4 +1,5 @@
+ import sys
++from models.masks import make_pad_mask
+ import time
+ import numpy as np
+ import torch
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/encoder/transformer.py repo_mps/models/encoder/transformer.py
+--- repo/models/encoder/transformer.py	2026-09-11 15:44:47
++++ repo_mps/models/encoder/transformer.py	2026-09-11 16:01:20
+@@ -276,7 +276,7 @@
+         else:
+             pe_length = buffer[0][0].size(2) + xs.size(1)
+         xs, pos_emb, pe_index = self.pe.infer(xs, pe_index, pe_length)
+-        pos_emb = pos_emb.to('cuda')
++        pos_emb = pos_emb.to("mps")
+         xs, pos_emb, buffer, buffer_index, buffer_out = self.encoders.infer(xs, pos_emb, 
+                                                                             buffer, buffer_index, buffer_out)
+ 
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/masks.py repo_mps/models/masks.py
+--- repo/models/masks.py	2026-09-11 15:44:47
++++ repo_mps/models/masks.py	2026-09-11 18:29:01
+@@ -122,7 +122,7 @@
+         chunk_masks = masks
+     return chunk_masks
+ 
+-def make_pad_mask(lengths: torch.Tensor) -> torch.Tensor:
++def make_pad_mask(lengths: torch.Tensor, max_len: int = None) -> torch.Tensor:
+     """Make mask tensor containing indices of padded part.
+ 
+     See description of make_non_pad_mask.
+@@ -140,7 +140,7 @@
+                  [0, 0, 1, 1, 1]]
+     """
+     batch_size = int(lengths.size(0))
+-    max_len = int(lengths.max().item())
++    max_len = int(lengths.max().item()) if max_len is None else int(max_len)
+     seq_range = torch.arange(0,
+                              max_len,
+                              dtype=torch.int64,
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/pipeline.py repo_mps/models/pipeline.py
+--- repo/models/pipeline.py	2026-09-11 15:44:47
++++ repo_mps/models/pipeline.py	2026-09-11 16:01:20
+@@ -18,7 +18,7 @@
+         self.model = init_encoder_llm(configs)
+         
+         load_checkpoint(self.model, self.args.model_path + "/audiollm/final.pt")
+-        device = torch.device('cuda')
++        device = torch.device("mps")
+         self.model = self.model.to(device)
+         self.model.eval()
+ 
+@@ -36,8 +36,8 @@
+             ## input fbank
+             feats = audio
+             if feats is not None:
+-                feats = feats.to('cuda')
+-                feats_lengths = torch.tensor([feats.size(1)]).to('cuda')
++                feats = feats.to("mps")
++                feats_lengths = torch.tensor([feats.size(1)]).to("mps")
+             else:
+                 feats_lengths = None
+ 
+@@ -55,8 +55,8 @@
+                 # add <|im_end|> in chat_prefix
+                 extra_inputs['role'] = '<|im_start|>system\n' + role # + '<|im_end|>'
+ 
+-            with torch.autocast(device_type="cuda", 
+-                       dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32):
++            with torch.autocast(device_type="mps", 
++                       dtype=torch.bfloat16 if True else torch.float32):
+                 # preprocess system role first              
+                 if stat == 'pre':
+                     past_key_values = self.model.set_system_role(extra_inputs)
+diff -ruN -x __pycache__ -x *.pyc -x Qwen2-7B-Instruct -x *.pt -x *.bin -x *.safetensors repo/models/utils.py repo_mps/models/utils.py
+--- repo/models/utils.py	2026-09-11 15:44:47
++++ repo_mps/models/utils.py	2026-09-11 16:01:20
+@@ -8,7 +8,7 @@
+ from models.encoder.encoder import speechEncoder
+ 
+ def load_checkpoint(model: torch.nn.Module, path: str) -> dict:
+-    if torch.cuda.is_available():
++    if torch.backends.mps.is_available():
+         print('Checkpoint: loading from checkpoint %s for GPU' % path)
+         checkpoint = torch.load(path)
+     else:

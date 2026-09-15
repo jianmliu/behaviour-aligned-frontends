@@ -1,0 +1,29 @@
+{
+ "targets": "nz/fo_fdb_ann",
+ "fdb": "data/fdb/v1.0/unz",
+ "noise_dir": "data/demand",
+ "init": "final.pt",
+ "out": "exp/fo_s_ann_m5",
+ "epochs": 2,
+ "lr": 0.0001,
+ "snr": [
+  -10.0,
+  0.0
+ ],
+ "max_sec": 12.0,
+ "pre_ramp": 20.0,
+ "w_margin": 1.0,
+ "margin": 2.0,
+ "w_pre_min": 1.0,
+ "w_pre": 3.0,
+ "w_miss": 1.0,
+ "w_false": 3.0,
+ "on_slack": 1.0,
+ "pre_slack": 1.0,
+ "late_slope": 0.25,
+ "clip": 1.0,
+ "seed": 0,
+ "max_steps": 0,
+ "log_every": 5,
+ "save_every": 50
+}

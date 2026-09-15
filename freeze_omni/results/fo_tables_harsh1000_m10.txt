@@ -1,0 +1,60 @@
+== fo_N_m10
+ask                                  100        43        57         0         0         0         0
+backchannel                          100        64        36         0         0         0         0
+deny                                 100        45        55         0         0         0         0
+others_talk_to_user_after            100        29        71         0         0         0         0
+others_talk_to_user_before           100         0         0         0       100         0         0
+pause                                100         2        39         0         0        59         0
+repeat                               100        34        66         0         0         0         0
+shift                                100        66        34         0         0         0         0
+talk_to_others                       100        34        66         0         0         0         0
+wait                                 100        12        88         0         0         0         0
+----------------------------------------------------------------------------------------------------
+TOTAL                               1000       329       512         0       100        59         0
+
+on-time 32.9%  premature 51.2%  miss 0.0%  mis-addressed 10.0%
+== fo_Ri_m10
+ask                                  100        39        61         0         0         0         0
+backchannel                          100        59        41         0         0         0         0
+deny                                 100        28        72         0         0         0         0
+others_talk_to_user_after            100        28        72         0         0         0         0
+others_talk_to_user_before           100         0         0         0       100         0         0
+pause                                100         1        44         0         0        55         0
+repeat                               100        30        70         0         0         0         0
+shift                                100        57        43         0         0         0         0
+talk_to_others                       100        42        58         0         0         0         0
+wait                                 100         4        96         0         0         0         0
+----------------------------------------------------------------------------------------------------
+TOTAL                               1000       288       557         0       100        55         0
+
+on-time 28.8%  premature 55.7%  miss 0.0%  mis-addressed 10.0%
+== fo_s_ann_m10
+ask                                  100        49        51         0         0         0         0
+backchannel                          100        64        36         0         0         0         0
+deny                                 100        52        48         0         0         0         0
+others_talk_to_user_after            100        34        66         0         0         0         0
+others_talk_to_user_before           100         0         0         0       100         0         0
+pause                                100         5        37         0         0        58         0
+repeat                               100        34        66         0         0         0         0
+shift                                100        65        35         0         0         0         0
+talk_to_others                       100        47        53         0         0         0         0
+wait                                 100        19        79         0         0         0         2
+----------------------------------------------------------------------------------------------------
+TOTAL                               1000       369       471         0       100        58         2
+
+on-time 36.9%  premature 47.1%  miss 0.0%  mis-addressed 10.0%
+== fo_rl_m10
+ask                                  100        39        61         0         0         0         0
+backchannel                          100        52        48         0         0         0         0
+deny                                 100        23        77         0         0         0         0
+others_talk_to_user_after            100        32        68         0         0         0         0
+others_talk_to_user_before           100         0         0         0       100         0         0
+pause                                100         0        47         0         0        53         0
+repeat                               100        29        71         0         0         0         0
+shift                                100        49        51         0         0         0         0
+talk_to_others                       100        43        57         0         0         0         0
+wait                                 100         4        96         0         0         0         0
+----------------------------------------------------------------------------------------------------
+TOTAL                               1000       271       576         0       100        53         0
+
+on-time 27.1%  premature 57.6%  miss 0.0%  mis-addressed 10.0%

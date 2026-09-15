@@ -1,0 +1,8 @@
+== fo_rl_full_m15
+TOTAL                                200        32       137         0        20        11         0
+
+on-time 16.0%  premature 68.5%  miss 0.0%  mis-addressed 10.0%
+== fo_rl_long_m15
+TOTAL                                200        46       120         0        20        14         0
+
+on-time 23.0%  premature 60.0%  miss 0.0%  mis-addressed 10.0%

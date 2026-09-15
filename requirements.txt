@@ -1,0 +1,7 @@
+# Common (both arms). Pin transformers for Freeze-Omni: its KV-cache code assumes tuple caches (5.x breaks it).
+torch>=2.3
+torchaudio>=2.3
+transformers==4.45.2
+soundfile>=0.12
+numpy>=1.26
+pypdf>=4  # only for the paper page-check helper

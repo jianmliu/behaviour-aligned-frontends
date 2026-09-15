@@ -1,0 +1,12 @@
+== probe_g10
+
+on-time 48.0%  premature 33.0%  miss 0.0%  mis-addressed 10.0%
+== probe_g20
+
+on-time 42.0%  premature 39.0%  miss 0.0%  mis-addressed 10.0%
+== probe_lp1k
+
+on-time 40.0%  premature 41.0%  miss 0.0%  mis-addressed 10.0%
+TOTAL                                200        75        91         0        20        14         0
+
+on-time 37.5%  premature 45.5%  miss 0.0%  mis-addressed 10.0%

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# 噪声篇 26：R-joint r1(lr3e-5) 变体评测——联合训练 RNNoise 增强 → 物化+推理
+set -euo pipefail
+export WORK=/ephemeral/work
+CK=$WORK/exp/rnj/r1/epoch_002.pt
+[ -f "$CK" ] || { echo "R-joint 训练未完，让队"; exit 75; }
+source /ephemeral/work/venv/bin/activate
+export PYTHONPATH=$WORK/geic_nemo/src:$WORK/nscripts
+cd $WORK/geic_nemo && source scripts/gpu_guard.sh
+gpu_lock
+# 训练 ckpt 是 {"fe": sd, ...} 包装；humdial_prep --rnnoise 吃裸 state_dict
+python -c "import torch; torch.save(torch.load('$CK', map_location='cpu', weights_only=True)['fe'], '$WORK/exp/rnj/r1/fe_final.pt')"
+NG=$(nvidia-smi -L | wc -l)
+CUDA_VISIBLE_DEVICES=0 python -u $WORK/nscripts/humdial_prep.py --humdial $WORK/humdial/en_test_nondev \
+  --mode noise --noise-dir $WORK/data/demand \
+  --rnnoise $WORK/exp/rnj/r1/fe_final.pt --out $WORK/nz/hd_Rjoint1 --per-scen 100
+pids=()
+for i in $(seq 0 $((NG-1))); do
+  CUDA_VISIBLE_DEVICES=$i python -u scripts/fdb_infer_lychee.py \
+    --fdb_root $WORK/nz/hd_Rjoint1 --lychee_repo $WORK/third_party/Lychee-FD \
+    --model_path $WORK/models/lychee-fd/lychee_full_duplex \
+    --out_root $WORK/nz/ev_Rjoint1 --shard $i --num-shards $NG \
+    > $WORK/logs/nz_Rj1_$i.log 2>&1 & pids+=($!)
+done
+for p in "${pids[@]}"; do wait "$p" || true; done
+n=$(set +o pipefail; ls $WORK/nz/ev_Rjoint1/*/*/events.json 2>/dev/null | wc -l)
+echo "ev_Rjoint1 完成 $n 条"
+[ "$n" -ge 950 ]

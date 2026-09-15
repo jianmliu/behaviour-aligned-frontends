@@ -1,0 +1,1 @@
+../common/test_soft_placement.py

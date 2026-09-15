@@ -1,0 +1,64 @@
+{
+ "ask": {
+  "n": 100,
+  "miss": 23,
+  "premature": 65,
+  "on_time": 12
+ },
+ "backchannel": {
+  "n": 100,
+  "premature": 68,
+  "miss": 26,
+  "on_time": 6
+ },
+ "deny": {
+  "n": 100,
+  "miss": 22,
+  "premature": 73,
+  "on_time": 5
+ },
+ "others_talk_to_user_after": {
+  "n": 100,
+  "premature": 68,
+  "miss": 21,
+  "on_time": 11
+ },
+ "others_talk_to_user_before": {
+  "n": 100,
+  "mis_addr": 49,
+  "miss": 26,
+  "premature": 25
+ },
+ "pause": {
+  "n": 100,
+  "premature": 52,
+  "miss": 32,
+  "break_preempt": 15,
+  "on_time": 1
+ },
+ "repeat": {
+  "n": 100,
+  "premature": 52,
+  "miss": 43,
+  "on_time": 5
+ },
+ "shift": {
+  "n": 100,
+  "premature": 70,
+  "on_time": 8,
+  "miss": 22
+ },
+ "talk_to_others": {
+  "n": 100,
+  "premature": 80,
+  "on_time": 8,
+  "late": 3,
+  "miss": 9
+ },
+ "wait": {
+  "n": 36,
+  "premature": 23,
+  "miss": 10,
+  "on_time": 3
+ }
+}

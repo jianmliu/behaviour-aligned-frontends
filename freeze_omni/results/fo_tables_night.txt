@@ -1,0 +1,24 @@
+== fo_L0
+TOTAL                                200        87        77         0        20        16         0
+
+on-time 43.5%  premature 38.5%  miss 0.0%  mis-addressed 10.0%
+== fo_N0
+TOTAL                                200        81        83         0        20        16         0
+
+on-time 40.5%  premature 41.5%  miss 0.0%  mis-addressed 10.0%
+== fo_Rindep
+TOTAL                                200        73        91         0        20        16         0
+
+on-time 36.5%  premature 45.5%  miss 0.0%  mis-addressed 10.0%
+== fo_s_ann
+TOTAL                                200        80        84         0        20        16         0
+
+on-time 40.0%  premature 42.0%  miss 0.0%  mis-addressed 10.0%
+== fo_rl_ann
+TOTAL                                200        76        88         0        20        16         0
+
+on-time 38.0%  premature 44.0%  miss 0.0%  mis-addressed 10.0%
+== fo_s_self
+TOTAL                                200        86        78         0        20        16         0
+
+on-time 43.0%  premature 39.0%  miss 0.0%  mis-addressed 10.0%

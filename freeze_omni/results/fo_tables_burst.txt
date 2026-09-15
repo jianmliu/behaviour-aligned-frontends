@@ -1,0 +1,30 @@
+== fo_burst10
+ask                                   20        11         9         0         0         0         0
+backchannel                           20        11         9         0         0         0         0
+deny                                  20        13         7         0         0         0         0
+others_talk_to_user_after             20        11         9         0         0         0         0
+others_talk_to_user_before            20         0         0         0        20         0         0
+pause                                 20         0         5         0         0        15         0
+repeat                                20         7        13         0         0         0         0
+shift                                 20        11         9         0         0         0         0
+talk_to_others                        20        11         9         0         0         0         0
+wait                                  20        10        10         0         0         0         0
+----------------------------------------------------------------------------------------------------
+TOTAL                                200        85        80         0        20        15         0
+
+on-time 42.5%  premature 40.0%  miss 0.0%  mis-addressed 10.0%
+== fo_burst20
+ask                                   20        10        10         0         0         0         0
+backchannel                           20        11         9         0         0         0         0
+deny                                  20        13         7         0         0         0         0
+others_talk_to_user_after             20        11         9         0         0         0         0
+others_talk_to_user_before            20         0         0         0        20         0         0
+pause                                 20         0         6         0         0        14         0
+repeat                                20         4        16         0         0         0         0
+shift                                 20        12         8         0         0         0         0
+talk_to_others                        20        10        10         0         0         0         0
+wait                                  20         8        12         0         0         0         0
+----------------------------------------------------------------------------------------------------
+TOTAL                                200        79        87         0        20        14         0
+
+on-time 39.5%  premature 43.5%  miss 0.0%  mis-addressed 10.0%
