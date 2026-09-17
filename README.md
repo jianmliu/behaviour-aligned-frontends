@@ -47,6 +47,7 @@ Symlinks inside `lychee/` and `freeze_omni/` point at `common/` so every script 
 | HumDial English test set (`en_test_nondev`, 4,550 recordings, 10 scenarios) | ICASSP 2026 HumDial challenge release | evaluation (100/scenario; 20/scenario for the rows marked n=200) |
 | Full-Duplex-Bench v1.0 user audio (727 recordings) | Full-Duplex-Bench | front-end training input; turn-end annotations are the Freeze-Omni placement targets |
 | DEMAND (16 kHz, `ch01.wav`) | DEMAND corpus | noise; environments held out between pretraining and test |
+| MUSAN noise subset (930 files, 16 kHz, 6.2 h) | OpenSLR 17 | second noise corpus (cross-corpus and retraining) |
 | Lychee-FD weights | HIT-TMG/Lychee-FD | `lychee/` |
 | Freeze-Omni checkpoints + Qwen2-7B-Instruct | VITA-MLLM/Freeze-Omni | `freeze_omni/` (Qwen2-7B-Instruct is also the relevance judge) |
 
@@ -108,6 +109,7 @@ are the literal commands; the table below maps paper statements to them.
 | relevance judge (Qwen2-7B-Instruct, 0/1/2) | `fo_judge_items.py` then `fo_judge_qwen.py` |
 | paired sign tests on first-response instants (|Δ| ≤ 0.2 s counts as tied) | `common/fo_signtest.py <tree A> <tree B>` |
 | differentiable whole-utterance forward vs streaming decode agreement | `fo_soft_forward.py --check` |
+| second noise corpus (MUSAN noise, OpenSLR 17): cross-corpus evaluation of the DEMAND-trained systems, then retraining on MUSAN | `chains/musan_eval.sh`, `chains/musan_train.sh` (`--noise-dir data/musan/noise --noise-glob '*.wav'`) |
 
 Summary tables for every regime are in `freeze_omni/results/fo_tables_*.txt`; the judge inputs and
 outputs are `items_*_m15.jsonl` and `scores_all_m15.jsonl` (scores are recovered from the `raw` field with

@@ -36,6 +36,7 @@ ap.add_argument("--humdial", type=pathlib.Path, required=True)
 ap.add_argument("--out", type=pathlib.Path, required=True)
 ap.add_argument("--per-scen", type=int, default=20)
 ap.add_argument("--noise-dir", type=pathlib.Path, default=None)
+ap.add_argument("--noise-glob", default="ch01.wav", help="噪声文件通配（DEMAND: ch01.wav；MUSAN 等: *.wav）")
 ap.add_argument("--snr", type=float, nargs=2, default=(0.0, 15.0))
 ap.add_argument("--rnnoise", default=None, help="RNNoiseTorch state_dict；None=无前端")
 ap.add_argument("--max-sec", type=float, default=40.0)
@@ -86,7 +87,7 @@ def rd(p):
 # ---------------------------------------------------------------- 噪声（与 humdial_prep 同分布/同 seed 规则）
 noises = []
 if a.noise_dir:
-    for f in sorted(a.noise_dir.rglob("ch01.wav")):          # DEMAND: <ENV>_16k/<ENV>/ch01.wav
+    for f in sorted(a.noise_dir.rglob(a.noise_glob)):          # DEMAND: <ENV>_16k/<ENV>/ch01.wav
         x, sr = sf.read(str(f), dtype="float32", always_2d=True)
         if sr != 16000:                                          # 跳过 48k 版本
             continue

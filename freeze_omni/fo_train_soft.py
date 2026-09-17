@@ -30,6 +30,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--targets", type=pathlib.Path, required=True)
 ap.add_argument("--fdb", type=pathlib.Path, required=True)
 ap.add_argument("--noise-dir", type=pathlib.Path, required=True)
+ap.add_argument("--noise-glob", default="ch01.wav", help="噪声文件通配（DEMAND: ch01.wav；MUSAN 等: *.wav）")
 ap.add_argument("--init", default=None)
 ap.add_argument("--out", type=pathlib.Path, required=True)
 ap.add_argument("--epochs", type=int, default=1)
@@ -70,7 +71,7 @@ print(f"[data] {len(items)} 条  respond {len(items)-n_ref} / refrain {n_ref}", 
 assert items
 
 noises = []
-for f in sorted(a.noise_dir.rglob("ch01.wav")):
+for f in sorted(a.noise_dir.rglob(a.noise_glob)):
     x, sr = sf.read(str(f), dtype="float32", always_2d=True)
     if sr != 16000:
         continue
