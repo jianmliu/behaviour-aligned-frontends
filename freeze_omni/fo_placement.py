@@ -46,6 +46,7 @@ ap.add_argument("--burst-db", type=float, default=10.0, help="爆发相对语音
 ap.add_argument("--gain-db", type=float, default=0.0, help="探针：全局增益 dB（波形域）")
 ap.add_argument("--lowpass", type=float, default=0.0, help="探针：低通截止 Hz（0=不用）")
 ap.add_argument("--policy", default=None, help="fo_train_rl 的 best.pt/last.pt（bands: 设 gain_bias/gain_exp）")
+ap.add_argument("--pre-enhanced", type=pathlib.Path, default=None, help="读 <dir>/<scen>/<sid>.wav（外部增强器输出，16 kHz），跳过加噪与前端")
 ap.add_argument("--fdb", action="store_true", help="--humdial 指向 FDB 根（task/id/input.wav 布局）")
 a = ap.parse_args()
 
@@ -155,7 +156,9 @@ for sc, w in samples:
     if len(x) > a.max_sec * 16000:
         x = x[: int(a.max_sec * 16000)]
     snr = None
-    if noises:
+    if a.pre_enhanced is not None:
+        x = torch.from_numpy(sf.read(str(a.pre_enhanced / sc / f"{sid}.wav"), dtype="float32")[0])
+    elif noises:
         x, snr = add_noise(x, f"{sc}/{sid}")
     if fe is not None:
         with torch.no_grad():

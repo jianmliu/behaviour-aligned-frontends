@@ -1,0 +1,14 @@
+== fo_N_m15
+on-time 28.4%  premature 56.5%  miss 0.0%  mis-addressed 10.0%
+== fo_Ri_m15
+on-time 24.3%  premature 61.2%  miss 0.0%  mis-addressed 10.0%
+== fo_sig_m15
+on-time 25.8%  premature 59.1%  miss 0.0%  mis-addressed 10.0%
+== fo_s_ann_m15
+on-time 35.8%  premature 49.0%  miss 0.2%  mis-addressed 10.0%
+== fo_dfn3_m15
+on-time 33.2%  premature 51.6%  miss 0.0%  mis-addressed 10.1%
+fo_dfn3_m15 vs fo_N_m15: n=1000 earlier=262 later=323 same=415 p=0.013
+fo_dfn3_m15 vs fo_Ri_m15: n=1000 earlier=182 later=398 same=420 p=1.7e-19
+fo_dfn3_m15 vs fo_sig_m15: n=1000 earlier=210 later=363 same=427 p=1.7e-10
+fo_dfn3_m15 vs fo_s_ann_m15: n=1000 earlier=299 later=262 same=437 p=0.13
