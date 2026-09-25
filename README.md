@@ -112,6 +112,7 @@ are the literal commands; the table below maps paper statements to them.
 | every Freeze-Omni number in the paper, recomputed from the per-sample trees | `verify_fo_claims.py` |
 | matched-SNR signal-retrained control (same data/steps/optimiser, loss = −SI-SNR) | `chains/sig_control.sh` (`fo_train_sig.py`, `fo_sisnr.py`) |
 | DeepFilterNet3 control: export the exact mixtures, enhance off-box, evaluate via `--pre-enhanced` (with an exactness gate) | `fo_dump_mix.py`, `dfn_enhance.py` (deepfilternet 0.5.6), `chains/controls_reordered.sh` |
+| Differentiable DeepFilterNet3 (not in the paper yet): PyTorch port of libdf's STFT/ERB/unit-norm features and ISTFT, so a decision loss can backpropagate through DFN3; matches libdf per stage and end to end to <1e-5 | `dfn_torch.py`, `test_dfn_torch.py` |
 | second noise corpus (MUSAN noise, OpenSLR 17): cross-corpus evaluation of the DEMAND-trained systems, then retraining on MUSAN | `chains/musan_eval.sh`, `chains/musan_train.sh` (`--noise-dir data/musan/noise --noise-glob '*.wav'`) |
 
 Summary tables for every regime are in `freeze_omni/results/fo_tables_*.txt`; the judge inputs and
