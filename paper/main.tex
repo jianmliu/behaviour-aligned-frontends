@@ -29,10 +29,10 @@ Hosted full-duplex speech LLMs are absorbing signal clean-up, leaving on-device 
 to serve the model's \emph{turn-taking decision}. We ask whether a suppressor trained on signal metrics
 serves that decision, and what changes when the same 78\,k-parameter RNNoise-style front-end is aligned
 to the decision through a frozen model, scoring first-response placement on a noisy HumDial test set. On \lfd\ (12.8\,B), signal-trained suppression restores every
-clean-condition pathology, while behaviour-level training cuts wrong-place responses from 67\,\% to
-48\,\% ($p<10^{-23}$) without losing on-time responses, staying silent where noise hides the evidence.
+clean-condition pathology, while behaviour-level training significantly cuts wrong-place responses, from 67\,\% to
+48\,\%, without losing on-time responses, staying silent where noise hides the evidence.
 On Freeze-Omni (7B) a front-end has no leverage at moderate noise; under severe masking the frozen
-suppressor makes the model take over earlier and the decision-aligned one later ($p<10^{-35}$), with
+suppressor makes the model take over earlier and the decision-aligned one significantly later, with
 first-response relevance preserved.
 Code: \url{https://github.com/jianmliu/behaviour-aligned-frontends}.
 \end{abstract}
