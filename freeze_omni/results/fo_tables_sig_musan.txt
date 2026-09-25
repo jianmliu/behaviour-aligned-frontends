@@ -1,0 +1,11 @@
+== mu_N_m15
+on-time 13.0%  premature 75.6%  miss 0.0%  mis-addressed 10.0%
+== mu_Ri_m15
+on-time 14.2%  premature 74.3%  miss 0.0%  mis-addressed 10.0%
+== mu_sig_tr_m15
+on-time 9.8%  premature 78.5%  miss 0.0%  mis-addressed 10.0%
+== mu_s_ann_tr_m15
+on-time 17.5%  premature 70.5%  miss 0.0%  mis-addressed 10.0%
+mu_sig_tr_m15 vs mu_N_m15: n=1000 earlier=404 later=282 same=314 p=3.6e-06
+mu_sig_tr_m15 vs mu_Ri_m15: n=1000 earlier=413 later=282 same=305 p=7.6e-07
+mu_sig_tr_m15 vs mu_s_ann_tr_m15: n=1000 earlier=464 later=242 same=294 p=5e-17
