@@ -1,18 +1,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% File:     spconfa4.sty          (LaTeX Document style option "spconfa4")
+% File:     spconf.sty          (LaTeX Document style option "spconf")
 %
 % Usage:    \documentclass{article}
-%           \usepackage{spconfa4}
+%           \usepackage{spconf}
 %
 %           Or for LaTeX 2.09:
-% Usage:    \documentstyle[...,spconfa4,...]{article}
+% Usage:    \documentstyle[...,spconf,...]{article}
 %
 % Purpose:
 %
 % Style file for Signal Processing Society Conferences (ICASSP, ICIP).
 % Features:
-%    - correct page size (178mm x 229mm)
+%    - correct page size (175mm x 226mm)
 %    - twocolumn format
 %    - boldfaced, numbered, and centered section headings
 %    - correct subsection and subsubsection headings
@@ -34,7 +34,7 @@
 %    use \sthanks{xx} after each name.
 %
 %                 \documentclass{article}
-%                 \usepackage{spconfa4}
+%                 \usepackage{spconf}
 %                 \title{Title of the paper}
 %                 \name{George P. Burdell and John Q. Professor
 %                       \thanks{This work was supported by...}}
@@ -58,7 +58,7 @@
 %    use \sthanks{xx} after each name.
 %
 %                 \documentclass{article}
-%                 \usepackage{spconfa4}
+%                 \usepackage{spconf}
 %                 \title{Title of the paper}
 %                 \twoauthors{John Doe
 %                       \thanks{This work was supported by...}}
@@ -83,13 +83,13 @@
 %
 % Preprint Option (Only for preprints, not for submissions!):
 %    - can create a preprint titlepage footer by using the
-%         "preprint" option with the \usepackage{spconfa4} command
+%         "preprint" option with the \usepackage{spconf} command
 %    - use \copyrightnotice{\copyright xx} for copyright information
 %    - use \toappear{To appear in xx} for publication name
 % Example of preprint use:
 %
 %                 \documentclass{article}
-%                 \usepackage[preprint]{spconfa4}
+%                 \usepackage[preprint]{spconf}
 %                         .
 %                 \copyrightnotice{\copyright\ IEEE 2000}
 %                 \toappear{To appear in {\it Proc.\ ICASSP2000,
@@ -105,7 +105,6 @@
 % Updated: Lance Cotton, Ulf-Dietrich Braumann, 11 May 2006
 % Change:  Added keywords/Index Terms section
 % Change:  Added \emergencystretch=11pt, Lance Cotton, 26-Sept-2007
-% Change:  Changed to A4 paper format, Bastian Sauert, 30-Nov-2011
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -124,13 +123,8 @@
 
 %\oddsidemargin  -0.31in
 %\evensidemargin -0.31in
-%\oddsidemargin  -6.2truemm
-%\evensidemargin -6.2truemm
-% modification for A4 paper format
-\setlength\paperheight {297mm}
-\setlength\paperwidth  {210mm}
-\oddsidemargin  -9.4truemm
-\evensidemargin -9.4truemm
+\oddsidemargin  -6.2truemm
+\evensidemargin -6.2truemm
 
 \topmargin 0truept
 \headheight 0truept

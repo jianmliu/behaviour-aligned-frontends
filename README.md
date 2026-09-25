@@ -20,7 +20,7 @@ Both arms share the front-end (`common/rnnoise_torch.py`), the placement metric
 ## Layout
 
 ```
-paper/            main.tex, refs.bib, figure, style files, compiled PDF
+paper/            main.tex, refs.bib, figures + make_figs.py, spconf.sty (US letter), compiled PDF
 common/           front-end, placement metric, noise protocol, soft-placement loss (+ unit tests), sign test
 common/rnnoise_pretrained_final.pt   signal-pretrained RNNoise-style checkpoint (the shared starting point)
 lychee/           Lychee-FD arm: offline full-duplex decoding, joint training (CE / soft / SI-SNR anchor), ES
@@ -132,8 +132,8 @@ ramp and the logit-margin term, and target extraction from real trajectories.
 
 ## Notes on what is and is not here
 
-- The figure `paper/fig_placement.pdf` is included; the one-off script that drew it from
-  `lychee/results/*.json` was not preserved.
+- Both figures are drawn by `paper/make_figs.py` (Times, 9 pt, TrueType fonts): Fig. 1 from `lychee/results/*_full.json`,
+  Fig. 2 from the Freeze-Omni dose tables.
 - Lychee-FD ES and soft-placement jobs (`queue/29`–`33`) are complete and smoke-tested but were not run for
   the submitted paper; the gradient-free probe is reported on Freeze-Omni only, as the paper states.
 - The Freeze-Omni relevance judge runs the 7B text model on MPS at ~3.4 s/item; 3,000 items take ~3 h.
