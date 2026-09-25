@@ -56,8 +56,8 @@
   "on_time": 2
  },
  "wait": {
-  "n": 99,
-  "premature": 44,
+  "n": 100,
+  "premature": 45,
   "miss": 46,
   "on_time": 9
  }

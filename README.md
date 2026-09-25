@@ -89,7 +89,7 @@ unattended). Each script states its inputs and outputs in its header.
 | soft-placement and ES variants on Lychee (prepared, not run for the paper) | `queue/29`–`33` |
 
 Placement counts per scenario are produced by `common/humdial_metrics3.py --root <eval tree> --humdial <HumDial>`;
-the JSON files in `lychee/results/` are those outputs. Paired McNemar tests are computed from the per-sample
+the JSON files in `lychee/results/` are those outputs (regenerated from the full 1000-sample trees). `lychee/verify_lychee_claims.py` recomputes every Lychee-FD number in the paper, including the paired McNemar tests. Paired McNemar tests are computed from the per-sample
 trees in `artifacts/lychee_per_sample_outputs.tgz`.
 
 ### Freeze-Omni (Sec. 3.3)
@@ -109,6 +109,8 @@ are the literal commands; the table below maps paper statements to them.
 | relevance judge (Qwen2-7B-Instruct, 0/1/2) | `fo_judge_items.py` then `fo_judge_qwen.py` |
 | paired sign tests on first-response instants (|Δ| ≤ 0.2 s counts as tied) | `common/fo_signtest.py <tree A> <tree B>` |
 | differentiable whole-utterance forward vs streaming decode agreement | `fo_soft_forward.py --check` |
+| every Freeze-Omni number in the paper, recomputed from the per-sample trees | `verify_fo_claims.py` |
+| matched-SNR signal-retrained control (same data/steps/optimiser, loss = −SI-SNR) | `chains/sig_control.sh` (`fo_train_sig.py`, `fo_sisnr.py`) |
 | second noise corpus (MUSAN noise, OpenSLR 17): cross-corpus evaluation of the DEMAND-trained systems, then retraining on MUSAN | `chains/musan_eval.sh`, `chains/musan_train.sh` (`--noise-dir data/musan/noise --noise-glob '*.wav'`) |
 
 Summary tables for every regime are in `freeze_omni/results/fo_tables_*.txt`; the judge inputs and
